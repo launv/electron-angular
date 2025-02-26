@@ -1,0 +1,49 @@
+<div class="my-form">
+  <div class="card">
+    @if (formGroup) {
+    <form class="card flex flex-col gap-4" [formGroup]="formGroup">
+      <div>
+        <label for="fluid" class="font-bold mb-2 block">Text</label>
+        <input type="text" pInputText formControlName="text" fluid />
+      </div>
+
+      <div>
+        <label class="font-bold mb-2 block">Country</label>
+        <div class="flex gap-1 items-center">
+          <p-checkbox formControlName="city" value="New York" inputId="ny" />
+          <label for="ny" class="ml-2">New York</label>
+        </div>
+      </div>
+
+      <div>
+        <label class="font-bold mb-2 block">City</label>
+        <p-select
+          formControlName="selectedCity"
+          [options]="cities"
+          optionLabel="name"
+          placeholder="Select a City"
+          fluid
+        />
+      </div>
+    </form>
+    }
+  </div>
+
+  <div class="action-buttons">
+    <p-button
+      label="Read"
+      icon="pi pi-book"
+      iconPos="right"
+      (onClick)="readFile()"
+    />
+
+    <p-button
+      label="Write"
+      icon="pi pi-save"
+      iconPos="right"
+      severity="danger"
+      [disabled]="formGroup?.invalid"
+      (onClick)="writeFile()"
+    />
+  </div>
+</div>

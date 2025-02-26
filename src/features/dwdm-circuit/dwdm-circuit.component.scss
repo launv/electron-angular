@@ -1,0 +1,5 @@
+:host ::ng-deep .dwdm {
+  .diagram-container {
+    @apply w-full h-[600px] border;
+  }
+}

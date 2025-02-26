@@ -1,0 +1,5 @@
+:host ::ng-deep .my-form {
+  .action-buttons {
+    @apply w-full justify-center items-center space-x-4 flex p-4;
+  }
+}

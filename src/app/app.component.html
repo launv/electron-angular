@@ -1,16 +1,10 @@
-<h1 class="text-3xl font-bold underline">{{ title }}</h1>
-
-<div class="text">
-  <p-button
-    label="Write"
-    icon="pi pi-save"
-    iconPos="right"
-    (onClick)="writeFile()"
-  />
-  <p-button
-    label="Read"
-    icon="pi pi-book"
-    iconPos="right"
-    (onClick)="readFile()"
-  />
+<div class="space-y-4 p-4">
+  <div class="card flex justify-between">
+    <h1 class="text-3xl font-bold">{{ title }}</h1>
+    <p-menubar [model]="items" />
+  </div>
+  <!-- The routed views render in the <router-outlet>-->
+  <div class="py-4">
+    <router-outlet />
+  </div>
 </div>
