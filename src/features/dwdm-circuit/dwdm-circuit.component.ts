@@ -5,10 +5,7 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import { dia, routers } from '@joint/core'; // Use this for the free version
 import * as joint from 'jointjs'; // Use this for the free version
-
-import { isCellHidden } from './utils';
 
 @Component({
   standalone: true,
@@ -37,8 +34,8 @@ export class DwdmCircuitComponent implements AfterViewInit {
     rect.position(100, 100);
     rect.resize(100, 40);
     rect.attr({
-      body: { fill: "blue" },
-      label: { text: "Hello JointJS", fill: "white" },
+      body: { fill: 'blue' },
+      label: { text: 'Hello JointJS', fill: 'white' },
     });
 
     rect.addTo(graph);

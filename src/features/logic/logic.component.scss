@@ -1,0 +1,94 @@
+:host ::ng-deep .logic {
+  .diagram-container {
+    @apply w-full h-[600px] border mx-auto;
+  }
+
+  .connection {
+    @apply stroke-gray-200;
+  }
+
+  .connection-wrap {
+    @apply transition-all duration-500 delay-200;
+    stroke-linecap: butt;
+  }
+
+  .connection-wrap:hover {
+    @apply stroke-gray-300 stroke-[9px] transition-none;
+  }
+
+  .link-tools {
+    .tool-remove circle {
+      @apply fill-white stroke-gray-300 stroke-[1px];
+    }
+
+    .tool-remove:hover circle {
+      @apply fill-red-500 stroke-red-700;
+    }
+
+    .tool-remove path {
+      @apply stroke-gray-300;
+    }
+
+    .tool-remove circle {
+      @apply transition-[fill] duration-1000;
+    }
+
+    .tool-remove:hover path {
+      @apply stroke-none;
+    }
+  }
+
+  .marker-arrowhead,
+  .marker-vertex {
+    @apply fill-white stroke-gray-500;
+    @apply hover:fill-gray-100 hover:stroke-gray-400;
+  }
+
+  .marker-vertex-remove-area {
+    @apply fill-white stroke-gray-300;
+    @apply hover:transition-[fill] hover:duration-1000 hover:fill-red-500 hover:stroke-red-700;
+  }
+
+  .marker-vertex-remove {
+    @apply stroke-gray-200;
+    @apply hover:stroke-none;
+  }
+
+  .joint-element {
+    .highlighted {
+      @apply outline-none fill-gray-100 stroke-gray-400 cursor-crosshair;
+    }
+
+    .body {
+      @apply fill-teal-400 stroke-teal-500  transition-all duration-200;
+    }
+
+    circle {
+      @apply fill-white stroke-gray-500  stroke-[2px];
+    }
+
+    text {
+      @apply fill-white;
+    }
+  }
+
+  .joint-link.live > .connection {
+    @apply stroke-cyan-500 stroke-[3px];
+  }
+
+  .live .connection-wrap {
+    @apply stroke-indigo-500;
+  }
+
+  .joint-element.live .body {
+    @apply fill-orange-400 stroke-orange-700;
+  }
+
+  .joint-element.live text {
+    @apply fill-white;
+  }
+
+  .wire {
+    @apply stroke-red-500;
+  }
+}

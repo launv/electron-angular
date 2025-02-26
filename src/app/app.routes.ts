@@ -4,6 +4,7 @@ export const URL_STRING = {
   HOME: '',
   FORM: 'form',
   DWDM: 'dwdm',
+  LOGIC: 'logic',
 };
 
 export const routes: Routes = [
@@ -18,6 +19,11 @@ export const routes: Routes = [
       import('../features/dwdm-circuit/dwdm-circuit.component').then(
         (c) => c.DwdmCircuitComponent
       ),
+  },
+  {
+    path: URL_STRING.LOGIC,
+    loadComponent: () =>
+      import('../features/logic/logic.component').then((c) => c.LogicComponent),
   },
   {
     path: URL_STRING.HOME,

@@ -27,6 +27,11 @@ export class AppComponent implements OnInit {
         icon: 'pi pi-sitemap',
         routerLink: '/' + URL_STRING.DWDM,
       },
+      {
+        label: 'Logic',
+        icon: 'pi pi-microchip-ai',
+        routerLink: '/' + URL_STRING.LOGIC,
+      },
     ];
   }
 }
