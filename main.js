@@ -19,8 +19,8 @@ function createWindow() {
       enableRemoteModule: true,
     },
     autoHideMenuBar: true,
-    maximizable: false,
-    minimizable: false,
+    maximizable: true,
+    minimizable: true,
   });
   mainWindow.maximize();
 

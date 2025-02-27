@@ -1,5 +1,40 @@
 :host ::ng-deep .dwdm {
-  .diagram-container {
-    @apply w-full h-[600px] border;
+  $stencil: 18rem;
+  $inspector: 18rem;
+
+  @apply flex relative w-full overflow-hidden;
+  height: calc(100vh - 5rem);
+
+  .stencil {
+    @apply h-full absolute top-0 left-0;
+    width: $stencil;
+  }
+
+  .paper {
+    @apply flex-1 h-full absolute top-10;
+    width: calc(100% - $stencil - $inspector);
+    left: $stencil;
+    right: $inspector;
+
+    .toolbar {
+      @apply absolute top-4 right-10 z-50;
+
+      .joint-toolbar {
+        @apply p-2;
+      }
+    }
+
+    .navigator {
+      @apply absolute right-10 bottom-10 z-50;
+
+      .joint-navigator {
+        @apply border-none;
+      }
+    }
+  }
+
+  .inspector {
+    @apply absolute top-0 right-0 h-full;
+    width: $inspector;
   }
 }

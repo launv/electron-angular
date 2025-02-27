@@ -149,10 +149,7 @@ export class LogicComponent implements AfterViewInit {
 
     // cancel all signals stores in wires
 
-    this.graph.getLinks().forEach((element) => {
-      joint.util.invokeProperty(element, 'signal', [0]);
-    });
-    console.log('this.graph.getLinks()', this.graph.getLinks());
+    joint.util.invoke(this.graph.getLinks(), 'set', { signal: 0 } as any);
 
     // remove all 'live' classes
     joint
@@ -173,22 +170,21 @@ export class LogicComponent implements AfterViewInit {
   };
 
   private broadcastSignal = (gate: any, signal: number) => {
-    console.log(gate, signal);
-
     // broadcast signal to all output ports
     setTimeout(() => {
-      const connectedLinks = this.graph.getConnectedLinks(gate, {
-        outbound: true,
-      });
-
-      joint.util.invoke(connectedLinks, 'signal', [signal]);
-      console.log(gate, signal);
-    }, 1000);
+      joint.util.invoke(
+        this.graph.getConnectedLinks(gate, {
+          outbound: true,
+        }),
+        'set',
+        { signal } as any
+      );
+    }, 0);
   };
 
   private toggleLive = (model: any, signal: number) => {
     // add 'live' class to the element if there is a positive signal
-    model.findView(this.paper).vel.toggleClass('live', signal > 0);
+    model.findView(this.paper)?.vel.toggleClass('live', signal > 0);
   };
 
   private signalListener = () => {
@@ -201,9 +197,7 @@ export class LogicComponent implements AfterViewInit {
       signal: any,
       handler: any
     ) => {
-      setTimeout(() => {
-        handler(signal);
-      }, 400);
+      setTimeout(() => handler(signal), 400);
     };
     // Output element just marks itself as alive.
     this.shapes.logic.Output.prototype.onSignal = (signal: number) => {
@@ -249,7 +243,7 @@ export class LogicComponent implements AfterViewInit {
             return (
               Math.max.apply(
                 this,
-                joint.util.invoke(wires, 'set', ['signal', signal])
+                joint.util.invoke(wires, 'set', { signal } as any)
               ) > 0
             );
           });

@@ -3,4 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 @import "primeicons/primeicons.css";
-// @import "~@clientio/jointjs/dist/joint.css";
+@import "joint-plus/joint-plus.css";
+body {
+  height: 100vh;
+  box-sizing: border-box;
+  margin: 0;
+}
