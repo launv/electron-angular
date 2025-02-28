@@ -18,4 +18,6 @@ export const IPC_EVENT = {
   WRITE_FILE_RESPONSE: 'write-file-response',
   READ_FILE: 'read-file',
   READ_FILE_RESPONSE: 'read-file-response',
+  READ_FOLDER: 'read-folder',
+  READ_FOLDER_RESPONSE: 'read-folder-response',
 };

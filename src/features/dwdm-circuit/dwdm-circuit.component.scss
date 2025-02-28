@@ -1,20 +1,19 @@
-:host ::ng-deep .dwdm {
-  $stencil: 18rem;
-  $inspector: 18rem;
+@use "../../styles/index" as theme;
 
+:host ::ng-deep .dwdm {
   @apply flex relative w-full overflow-hidden;
-  height: calc(100vh - 5rem);
+  height: calc(100vh - theme.$header);
 
   .stencil {
     @apply h-full absolute top-0 left-0;
-    width: $stencil;
+    width: theme.$stencil;
   }
 
   .paper {
-    @apply flex-1 h-full absolute top-10;
-    width: calc(100% - $stencil - $inspector);
-    left: $stencil;
-    right: $inspector;
+    @apply flex-1 h-full absolute;
+    width: calc(100% - theme.$stencil - theme.$inspector);
+    left: theme.$stencil;
+    right: theme.$inspector;
 
     .toolbar {
       @apply absolute top-4 right-10 z-50;
@@ -35,6 +34,6 @@
 
   .inspector {
     @apply absolute top-0 right-0 h-full;
-    width: $inspector;
+    width: theme.$inspector;
   }
 }

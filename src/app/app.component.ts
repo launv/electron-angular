@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
-import { URL_STRING } from './app.routes';
+import { URL_STRING } from '../../shared/constants/url-string';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +20,11 @@ export class AppComponent implements OnInit {
       {
         label: 'Home',
         icon: 'pi pi-home',
+        routerLink: '/' + URL_STRING.FOLDER_READER,
+      },
+      {
+        label: 'Form',
+        icon: 'pi pi-pencil',
         routerLink: '/' + URL_STRING.FORM,
       },
       {

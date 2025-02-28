@@ -7,8 +7,8 @@ export const stencilConfig: ui.Stencil.Options = {
   width: 220,
   height: 500,
   groups: {
-    myShapesGroup1: { index: 1, label: ' My Shapes 1' },
-    myShapesGroup2: { index: 2, label: ' My Shapes 2' },
+    myShapesGroup1: { index: 1, label: ' Simple', closed: true },
+    myShapesGroup2: { index: 2, label: ' Advanced' },
   },
   groupsToggleButtons: true,
   search: {

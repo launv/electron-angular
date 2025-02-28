@@ -10,8 +10,8 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 800,
     webPreferences: {
       // webSecurity: false, // ⚠️ Not recommended for production
       nodeIntegration: true, // Allows access to Node.js APIs
@@ -70,3 +70,18 @@ ipcMain.on("read-file", (event, filePath) => {
     else event.reply("read-file-response", { success: true, data });
   });
 });
+
+ipcMain.on("read-folder", (event, dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  readFolder(event, dir);
+});
+
+function readFolder(event, dir) {
+  fs.readdir(dir, (err, data) => {
+    if (err)
+      event.reply("read-folder-response", { success: false, error: err });
+    else event.reply("read-folder-response", { success: true, data });
+  });
+}

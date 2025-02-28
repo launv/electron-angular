@@ -1,13 +1,12 @@
 import { Routes } from '@angular/router';
-
-export const URL_STRING = {
-  HOME: '',
-  FORM: 'form',
-  DWDM: 'dwdm',
-  LOGIC: 'logic',
-};
+import { URL_STRING } from '../../shared/constants/url-string';
 
 export const routes: Routes = [
+  {
+    path: URL_STRING.FOLDER_READER,
+    loadChildren: () =>
+      import('../features/folder-reader/folder-reader.routes'),
+  },
   {
     path: URL_STRING.FORM,
     loadComponent: () =>
@@ -27,7 +26,7 @@ export const routes: Routes = [
   },
   {
     path: URL_STRING.HOME,
-    redirectTo: `/${URL_STRING.DWDM}`,
+    redirectTo: `/${URL_STRING.FOLDER_READER}`,
     pathMatch: 'full',
   },
 ];

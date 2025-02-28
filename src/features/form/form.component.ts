@@ -11,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { IPC_EVENT } from '../../../shared/constants/main-events';
 import { IPC_RESPONSE } from '../../../shared/interfaces/ipc-response';
+import { environment } from 'environments/environment';
 
 declare const window: any; // Ensure Electron is available
 
@@ -34,7 +35,7 @@ interface City {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponent {
-  filePath = 'C:/Users/70020253/Documents/test.txt'; // Change as needed
+  filePath = environment.dir + '/test.txt'; // Change as needed
   formGroup: FormGroup | undefined;
   cities: City[] = [];
 

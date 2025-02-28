@@ -1,8 +1,11 @@
+@use "../styles/index" as theme;
+
 :host ::ng-deep .my-app {
   @apply space-y-4;
 
   .my-header {
-    @apply flex justify-between p-4 h-10;
+    @apply flex justify-between p-4;
+    height: theme.$header;
 
     h1 {
       @apply text-3xl font-bold;
