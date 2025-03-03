@@ -15,8 +15,6 @@ type FolderState = {
   isLoading: boolean;
 
   filter: { query: string; order: 'asc' | 'desc' };
-
-  stack: string[];
 };
 
 const initialState: FolderState = {
@@ -25,8 +23,6 @@ const initialState: FolderState = {
   isLoading: false,
 
   filter: { query: '', order: 'asc' },
-
-  stack: [environment.dir],
 };
 
 export const FolderReaderStore = signalStore(
@@ -34,9 +30,7 @@ export const FolderReaderStore = signalStore(
 
   withState(initialState),
 
-  withComputed(({ stack, folders }) => ({
-    dir: computed(() => join(stack(), '/')),
-
+  withComputed(({ folders }) => ({
     foldersCount: computed(() => folders().length),
 
     fileredFolders: computed(() => filter(folders(), (f) => !includes(f, '.'))),
@@ -53,20 +47,6 @@ export const FolderReaderStore = signalStore(
 
     setFolders(folders: string[]): void {
       patchState(store, { folders });
-    },
-
-    setStack(stack: string[]): void {
-      patchState(store, { stack });
-    },
-
-    addStack(value: string): void {
-      patchState(store, ({ stack }) => ({ stack: [...stack, value] }));
-    },
-
-    popStack(): void {
-      patchState(store, ({ stack }) => {
-        return { stack: slice(stack) };
-      });
     },
   }))
 );

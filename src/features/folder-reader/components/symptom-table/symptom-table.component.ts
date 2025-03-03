@@ -36,11 +36,54 @@ export class SymptomTableComponent extends ObservableComponent {
       const { dir, system, symptom } = res;
       this.symptomName = symptom;
       const routeTree = [environment.dir, dir, system, symptom, 'data.json'];
-      this.readFile(routeTree.join('/'));
+      const filePath = routeTree.join('/');
+      // this.readFile(filePath);
+      this.writeFile(filePath);
     });
   }
 
-  readFile(filePath: string) {
+  /**
+   *
+   */
+
+  writeFile = (filePath: string) => {
+    const data = [
+      {
+        code: '1',
+        name: 'Auto 1',
+        category: 'Cat 1',
+        quantity: 1,
+      },
+      {
+        code: '2',
+        name: 'Auto 2',
+        category: 'Cat 2',
+        quantity: 2,
+      },
+    ];
+
+    window.require('electron').ipcRenderer.send(IPC_EVENT.WRITE_FILE, {
+      filePath,
+      content: JSON.stringify(data),
+    });
+
+    window
+      .require('electron')
+      .ipcRenderer.once(
+        IPC_EVENT.WRITE_FILE_RESPONSE,
+        (_: any, response: IPC_RESPONSE) => {
+          const { success, error } = response;
+
+          if (success) this.readFile(filePath);
+          else alert('Error writing file: ' + error);
+        }
+      );
+  };
+  /**
+   *
+   * @param filePath
+   */
+  readFile = (filePath: string) => {
     window.require('electron').ipcRenderer.send(IPC_EVENT.READ_FILE, filePath);
 
     window
@@ -56,7 +99,11 @@ export class SymptomTableComponent extends ObservableComponent {
           } else alert('Error reading file: ' + error);
         }
       );
-  }
+  };
 
+  /**
+   *
+   * @returns
+   */
   back = () => this.location.back();
 }

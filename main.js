@@ -78,6 +78,16 @@ ipcMain.on("read-folder", (event, dir) => {
   readFolder(event, dir);
 });
 
+ipcMain.on("create-folder", (event, dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdir(dir, (err, data) => {
+      if (err)
+        event.reply("create-folder-response", { success: false, error: err });
+      else event.reply("create-folder-response", { success: true, data });
+    });
+  }
+});
+
 function readFolder(event, dir) {
   fs.readdir(dir, (err, data) => {
     if (err)

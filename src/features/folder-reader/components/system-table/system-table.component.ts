@@ -13,13 +13,14 @@ import { FolderReaderStore } from '../../folder-reader.store';
 import { SystemTableStore } from './system-table.store';
 
 import { CommonModule, Location } from '@angular/common';
-import { indexOf } from 'lodash';
+import { delay, indexOf, random } from 'lodash';
 import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
 import { STORAGE_KEY } from '../../../../../shared/constants/storage-key';
 import { URL_STRING } from '../../../../../shared/constants/url-string';
 import { ObservableComponent } from '../../../../../shared/observable/observable.component';
 import { takeUntil } from 'rxjs';
+import { environment } from 'environments/environment';
 
 declare const window: any; // Ensure Electron is available
 
@@ -56,7 +57,7 @@ export class SystemTableComponent extends ObservableComponent {
       const { dir } = res;
       this.buttonDir = dir ?? '';
       this.componentStore.reset();
-      this.readFolders();
+      this.createSystemList();
     });
 
     effect(() => {
@@ -67,7 +68,7 @@ export class SystemTableComponent extends ObservableComponent {
           .require('electron')
           .ipcRenderer.send(
             IPC_EVENT.READ_FOLDER,
-            `${this.store.dir()}/${this.buttonDir}/${selectedSystem}`
+            `${environment.dir}/${this.buttonDir}/${selectedSystem}`
           );
 
         window
@@ -86,12 +87,25 @@ export class SystemTableComponent extends ObservableComponent {
     });
   }
 
-  private readFolders = () => {
+  private createSystemList = () => {
+    for (let index = 1; index < random(5); index++) {
+      window
+        .require('electron')
+        .ipcRenderer.send(
+          IPC_EVENT.CREATE_FOLDER,
+          `${environment.dir}/${this.buttonDir}/System ${index}`
+        );
+    }
+
+    this.scanSystemList();
+  };
+
+  private scanSystemList = () => {
     window
       .require('electron')
       .ipcRenderer.send(
         IPC_EVENT.READ_FOLDER,
-        `${this.store.dir()}/${this.buttonDir}`
+        `${environment.dir}/${this.buttonDir}`
       );
 
     window
@@ -116,7 +130,19 @@ export class SystemTableComponent extends ObservableComponent {
    * @param systemDir
    */
   selectSystem = (systemDir: string) => {
-    this.componentStore.setSelectedSystem(systemDir);
+    this.createSymptomList(systemDir);
+    delay(() => this.componentStore.setSelectedSystem(systemDir), 500);
+  };
+
+  private createSymptomList = (systemDir: string) => {
+    for (let index = 1; index < random(5); index++) {
+      window
+        .require('electron')
+        .ipcRenderer.send(
+          IPC_EVENT.CREATE_FOLDER,
+          `${environment.dir}/${this.buttonDir}/${systemDir}/Symptom ${index}`
+        );
+    }
   };
 
   /**

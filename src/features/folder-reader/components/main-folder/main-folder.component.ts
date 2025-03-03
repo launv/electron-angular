@@ -11,6 +11,8 @@ import { URL_STRING } from '../../../../../shared/constants/url-string';
 import { IPC_RESPONSE } from '../../../../../shared/interfaces/ipc-response';
 import { FolderReaderStore } from '../../folder-reader.store';
 import { STORAGE_KEY } from '../../../../../shared/constants/storage-key';
+import { environment } from 'environments/environment';
+import { random } from 'lodash';
 declare const window: any; // Ensure Electron is available
 
 @Component({
@@ -26,7 +28,7 @@ export class MainFolderComponent {
   readonly store = inject(FolderReaderStore);
 
   constructor(readonly router: Router) {
-    this.readFolders();
+    this.createFolders();
 
     effect(() => {
       const folders = this.store.fileredFolders();
@@ -35,10 +37,23 @@ export class MainFolderComponent {
     });
   }
 
+  private createFolders = () => {
+    for (let index = 1; index < random(5); index++) {
+      window
+        .require('electron')
+        .ipcRenderer.send(
+          IPC_EVENT.CREATE_FOLDER,
+          `${environment.dir}/Folder ${index}`
+        );
+    }
+
+    this.readFolders();
+  };
+
   private readFolders = () => {
     window
       .require('electron')
-      .ipcRenderer.send(IPC_EVENT.READ_FOLDER, this.store.dir());
+      .ipcRenderer.send(IPC_EVENT.READ_FOLDER, environment.dir);
 
     window
       .require('electron')

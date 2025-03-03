@@ -20,4 +20,6 @@ export const IPC_EVENT = {
   READ_FILE_RESPONSE: 'read-file-response',
   READ_FOLDER: 'read-folder',
   READ_FOLDER_RESPONSE: 'read-folder-response',
+  CREATE_FOLDER: 'create-folder',
+  CREATE_FOLDER_RESPONSE: 'create-folder-response',
 };
