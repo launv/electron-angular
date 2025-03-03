@@ -65,8 +65,6 @@ export const FolderReaderStore = signalStore(
 
     popStack(): void {
       patchState(store, ({ stack }) => {
-        console.log(slice(stack));
-
         return { stack: slice(stack) };
       });
     },
