@@ -1,7 +1,9 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 
-type SubFolderState = {
+type SystemTableState = {
   systems: string[];
+
+  selectedSystem: string;
 
   symptom: string[];
 
@@ -10,8 +12,10 @@ type SubFolderState = {
   filter: { query: string; order: 'asc' | 'desc' };
 };
 
-const initialState: SubFolderState = {
+const initialState: SystemTableState = {
   systems: [],
+
+  selectedSystem: '',
 
   symptom: [],
 
@@ -20,7 +24,7 @@ const initialState: SubFolderState = {
   filter: { query: '', order: 'asc' },
 };
 
-export const SubFolderStore = signalStore(
+export const SystemTableStore = signalStore(
   withState(initialState),
 
   withMethods((store) => ({
@@ -36,8 +40,16 @@ export const SubFolderStore = signalStore(
       patchState(store, { systems });
     },
 
+    setSelectedSystem(selectedSystem: string): void {
+      patchState(store, { selectedSystem });
+    },
+
     setSymptom(symptom: string[]): void {
       patchState(store, { symptom });
+    },
+
+    reset() {
+      patchState(store, initialState);
     },
   }))
 );

@@ -1,0 +1,38 @@
+@use "../../../../styles/index" as theme;
+
+:host ::ng-deep .system-table {
+  @apply h-full overflow-hidden flex flex-col;
+
+  .toolbar {
+    @apply grid grid-cols-3 gap-4 p-4;
+  }
+
+  .content {
+    @apply grid grid-cols-2 p-4 pt-0 gap-4 flex-1 overflow-hidden;
+
+    .system-panel {
+      @apply h-full;
+
+      .p-panel {
+        @apply overflow-hidden flex flex-col;
+      }
+
+      .p-panel-content-container {
+        @apply flex-1 overflow-auto;
+
+        .p-panel-content {
+          @apply h-full;
+        }
+      }
+
+      .system-item {
+        @apply w-full p-4 bg-gray-50 rounded flex justify-between items-center;
+        @apply cursor-pointer hover:bg-gray-100;
+
+        &.active {
+          @apply border-green-500 bg-green-100;
+        }
+      }
+    }
+  }
+}

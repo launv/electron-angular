@@ -1,11 +1,11 @@
-<div class="grid grid-cols-4 gap-4 p-4">
+<div class="main">
   @for (folder of store.fileredFolders(); track $index) {
   <p-button
     [label]="folder"
     icon="pi pi-arrow-right"
     iconPos="top"
-    class="w-full"
-    styleClass="w-full"
+    class="w-full aspect-square"
+    styleClass="w-full h-full"
     (onClick)="onRoute(folder)"
   />
   }

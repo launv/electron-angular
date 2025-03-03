@@ -55,8 +55,6 @@ export class MainFolderComponent {
   };
 
   onRoute = (dir: string) => {
-    console.log(dir);
-    debugger
     this.router.navigate([URL_STRING.FOLDER_READER, dir]);
   };
 }

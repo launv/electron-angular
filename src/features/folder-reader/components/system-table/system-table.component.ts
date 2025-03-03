@@ -1,54 +1,48 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
 } from '@angular/core';
-import {
-  ActivatedRoute,
-  DefaultUrlSerializer,
-  Router,
-  UrlSerializer,
-  UrlTree,
-} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PanelModule } from 'primeng/panel';
 import { IPC_EVENT } from '../../../../../shared/constants/main-events';
 import { IPC_RESPONSE } from '../../../../../shared/interfaces/ipc-response';
-import { FolderReaderStore } from './../../folder-reader.store';
-import { SubFolderStore } from './sub-folder.store';
+import { FolderReaderStore } from '../../folder-reader.store';
+import { SystemTableStore } from './system-table.store';
 
-import { Location } from '@angular/common';
-import { indexOf, join } from 'lodash';
+import { CommonModule, Location } from '@angular/common';
+import { indexOf } from 'lodash';
+import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
 import { STORAGE_KEY } from '../../../../../shared/constants/storage-key';
 import { URL_STRING } from '../../../../../shared/constants/url-string';
-import { DividerModule } from 'primeng/divider';
+import { ObservableComponent } from '../../../../../shared/observable/observable.component';
+import { takeUntil } from 'rxjs';
 
 declare const window: any; // Ensure Electron is available
 
 @Component({
   standalone: true,
-  selector: 'app-sub-folder',
+  selector: 'app-system-table',
   imports: [
     ButtonModule,
     PanelModule,
     ButtonModule,
     DividerModule,
     InputTextModule,
+    CommonModule,
   ],
-  templateUrl: './sub-folder.component.html',
-  styleUrl: './sub-folder.component.scss',
+  templateUrl: './system-table.component.html',
+  styleUrl: './system-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [FolderReaderStore, SubFolderStore],
+  providers: [FolderReaderStore, SystemTableStore],
 })
-export class SubFolderComponent implements AfterViewInit, UrlSerializer {
+export class SystemTableComponent extends ObservableComponent {
   readonly store = inject(FolderReaderStore);
 
-  readonly componentStore = inject(SubFolderStore);
-
-  private defaultUrlSerializer: DefaultUrlSerializer =
-    new DefaultUrlSerializer();
+  readonly componentStore = inject(SystemTableStore);
 
   buttonDir = '';
   constructor(
@@ -56,20 +50,40 @@ export class SubFolderComponent implements AfterViewInit, UrlSerializer {
     private router: Router,
     private location: Location
   ) {
-    this.buttonDir = activatedRoute.snapshot.paramMap.get('dir') ?? '';
-  }
+    super();
 
-  parse(url: string): UrlTree {
-    return this.defaultUrlSerializer.parse(url);
-  }
+    activatedRoute.params.pipe(takeUntil(this.$destroy)).subscribe((res) => {
+      const { dir } = res;
+      this.buttonDir = dir ?? '';
+      this.componentStore.reset();
+      this.readFolders();
+    });
 
-  serialize(tree: UrlTree): string {
-    return this.defaultUrlSerializer.serialize(tree).replace(/%20/g, '-');
-  }
+    effect(() => {
+      const selectedSystem = this.componentStore.selectedSystem();
 
-  ngAfterViewInit(): void {
-    this.readFolders();
-    console.log(this.store.folders());
+      if (selectedSystem) {
+        window
+          .require('electron')
+          .ipcRenderer.send(
+            IPC_EVENT.READ_FOLDER,
+            `${this.store.dir()}/${this.buttonDir}/${selectedSystem}`
+          );
+
+        window
+          .require('electron')
+          .ipcRenderer.once(
+            IPC_EVENT.READ_FOLDER_RESPONSE,
+            (_: any, response: IPC_RESPONSE) => {
+              const { success, data, error } = response;
+
+              if (success && data) {
+                this.componentStore.setSymptom(data);
+              } else alert('Error reading folder: ' + error);
+            }
+          );
+      }
+    });
   }
 
   private readFolders = () => {
@@ -101,33 +115,31 @@ export class SubFolderComponent implements AfterViewInit, UrlSerializer {
    * root/buttonDir/{systemDir}
    * @param systemDir
    */
-  onOpen = (systemDir: string) => {
-    window
-      .require('electron')
-      .ipcRenderer.send(
-        IPC_EVENT.READ_FOLDER,
-        `${this.store.dir()}/${this.buttonDir}/${systemDir}`
-      );
-
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.READ_FOLDER_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, data, error } = response;
-
-          if (success && data) {
-            this.componentStore.setSymptom(data);
-          } else alert('Error reading folder: ' + error);
-        }
-      );
+  selectSystem = (systemDir: string) => {
+    this.componentStore.setSelectedSystem(systemDir);
   };
 
-  goTo = (buttonDir: string) => {
-    // TODO: replace url and reload
+  /**
+   *
+   * @param buttonDir
+   */
+  switchTo = (buttonDir: string) => {
     this.router.navigate([URL_STRING.FOLDER_READER, buttonDir], {
       replaceUrl: true,
     });
+  };
+
+  /**
+   *
+   * @param symptomPath
+   */
+  selectSymptom = (symptomPath: string) => {
+    this.router.navigate([
+      URL_STRING.FOLDER_READER,
+      this.buttonDir,
+      this.componentStore.selectedSystem(),
+      symptomPath,
+    ]);
   };
 
   get previousButton(): string | null {

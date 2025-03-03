@@ -3,6 +3,9 @@
     <h1>{{ title }}</h1>
     <p-menubar [model]="items" />
   </div>
+
   <!-- The routed views render in the <router-outlet>-->
-  <router-outlet />
+  <div class="my-content">
+    <router-outlet />
+  </div>
 </div>

@@ -1,7 +1,7 @@
 @use "../styles/index" as theme;
 
 :host ::ng-deep .my-app {
-  @apply space-y-4;
+  @apply h-[100vh] overflow-hidden flex flex-col;
 
   .my-header {
     @apply flex justify-between p-4;
@@ -10,5 +10,9 @@
     h1 {
       @apply text-3xl font-bold;
     }
+  }
+
+  .my-content {
+    @apply flex-1 overflow-hidden;
   }
 }

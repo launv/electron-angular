@@ -12,7 +12,7 @@ import { URL_STRING } from '../../shared/constants/url-string';
   imports: [RouterOutlet, MenubarModule],
 })
 export class AppComponent implements OnInit {
-  title = 'Kaio';
+  title = 'Kaio - DES';
   items: MenuItem[] | undefined;
 
   ngOnInit() {
