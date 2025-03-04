@@ -6,8 +6,7 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { environment } from 'environments/environment';
-import { filter, includes, slice, join } from 'lodash';
+import { filter, includes } from 'lodash';
 
 type FolderState = {
   folders: string[];

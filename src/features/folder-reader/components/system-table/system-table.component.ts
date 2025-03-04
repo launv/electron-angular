@@ -13,16 +13,15 @@ import { FolderReaderStore } from '../../folder-reader.store';
 import { SystemTableStore } from './system-table.store';
 
 import { CommonModule, Location } from '@angular/common';
-import { delay, indexOf, random } from 'lodash';
+import { environment } from 'environments/environment';
+import { indexOf, random } from 'lodash';
 import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
+import { takeUntil } from 'rxjs';
 import { STORAGE_KEY } from '../../../../../shared/constants/storage-key';
 import { URL_STRING } from '../../../../../shared/constants/url-string';
 import { ObservableComponent } from '../../../../../shared/observable/observable.component';
-import { takeUntil } from 'rxjs';
-import { environment } from 'environments/environment';
-
-declare const window: any; // Ensure Electron is available
+import { ElectronApiService } from '../../../../../shared/services/electron-api.service';
 
 @Component({
   standalone: true,
@@ -49,7 +48,8 @@ export class SystemTableComponent extends ObservableComponent {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private electron: ElectronApiService
   ) {
     super();
 
@@ -64,65 +64,53 @@ export class SystemTableComponent extends ObservableComponent {
       const selectedSystem = this.componentStore.selectedSystem();
 
       if (selectedSystem) {
-        window
-          .require('electron')
-          .ipcRenderer.send(
-            IPC_EVENT.READ_FOLDER,
-            `${environment.dir}/${this.buttonDir}/${selectedSystem}`
-          );
+        electron.send(
+          IPC_EVENT.READ_FOLDER,
+          `${environment.root}/${this.buttonDir}/${selectedSystem}`
+        );
 
-        window
-          .require('electron')
-          .ipcRenderer.once(
-            IPC_EVENT.READ_FOLDER_RESPONSE,
-            (_: any, response: IPC_RESPONSE) => {
-              const { success, data, error } = response;
+        electron
+          .once(IPC_EVENT.READ_FOLDER_RESPONSE)
+          .then((response: IPC_RESPONSE) => {
+            const { success, data, error } = response;
 
-              if (success && data) {
-                this.componentStore.setSymptom(data);
-              } else alert('Error reading folder: ' + error);
-            }
-          );
+            if (success && data) {
+              this.componentStore.setSymptom(data);
+            } else alert('Error reading folder: ' + error);
+          });
       }
     });
   }
 
   private createSystemList = () => {
     for (let index = 1; index < random(5); index++) {
-      window
-        .require('electron')
-        .ipcRenderer.send(
-          IPC_EVENT.CREATE_FOLDER,
-          `${environment.dir}/${this.buttonDir}/System ${index}`
-        );
+      this.electron.send(
+        IPC_EVENT.CREATE_FOLDER,
+        `${environment.root}/${this.buttonDir}/System ${index}`
+      );
     }
 
     this.scanSystemList();
   };
 
   private scanSystemList = () => {
-    window
-      .require('electron')
-      .ipcRenderer.send(
-        IPC_EVENT.READ_FOLDER,
-        `${environment.dir}/${this.buttonDir}`
-      );
+    this.electron.send(
+      IPC_EVENT.READ_FOLDER,
+      `${environment.root}/${this.buttonDir}`
+    );
 
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.READ_FOLDER_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, data, error } = response;
+    this.electron
+      .once(IPC_EVENT.READ_FOLDER_RESPONSE)
+      .then((response: IPC_RESPONSE) => {
+        const { success, data, error } = response;
 
-          if (success && data) {
-            this.componentStore.setSystems(data);
-          } else {
-            alert('Error reading folder: ' + error);
-            this.location.back();
-          }
+        if (success && data) {
+          this.componentStore.setSystems(data);
+        } else {
+          alert('Error reading folder: ' + error);
+          this.location.back();
         }
-      );
+      });
   };
 
   /**
@@ -131,17 +119,15 @@ export class SystemTableComponent extends ObservableComponent {
    */
   selectSystem = (systemDir: string) => {
     this.createSymptomList(systemDir);
-    delay(() => this.componentStore.setSelectedSystem(systemDir), 500);
+    this.componentStore.setSelectedSystem(systemDir);
   };
 
   private createSymptomList = (systemDir: string) => {
     for (let index = 1; index < random(5); index++) {
-      window
-        .require('electron')
-        .ipcRenderer.send(
-          IPC_EVENT.CREATE_FOLDER,
-          `${environment.dir}/${this.buttonDir}/${systemDir}/Symptom ${index}`
-        );
+      this.electron.send(
+        IPC_EVENT.CREATE_FOLDER,
+        `${environment.root}/${this.buttonDir}/${systemDir}/Symptom ${index}`
+      );
     }
   };
 

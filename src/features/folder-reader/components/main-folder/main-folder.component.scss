@@ -1,3 +1,4 @@
 :host ::ng-deep .main {
-  @apply grid grid-cols-4 gap-4 p-4 overflow-auto max-h-full;
+  @apply grid grid-cols-2 gap-4 p-4 overflow-auto max-h-full;
+  @apply md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6;
 }

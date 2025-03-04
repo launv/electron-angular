@@ -5,15 +5,15 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { IPC_EVENT } from '../../../../../shared/constants/main-events';
-import { URL_STRING } from '../../../../../shared/constants/url-string';
-import { IPC_RESPONSE } from '../../../../../shared/interfaces/ipc-response';
-import { FolderReaderStore } from '../../folder-reader.store';
-import { STORAGE_KEY } from '../../../../../shared/constants/storage-key';
 import { environment } from 'environments/environment';
 import { random } from 'lodash';
-declare const window: any; // Ensure Electron is available
+import { ButtonModule } from 'primeng/button';
+import { IPC_EVENT } from '../../../../../shared/constants/main-events';
+import { STORAGE_KEY } from '../../../../../shared/constants/storage-key';
+import { URL_STRING } from '../../../../../shared/constants/url-string';
+import { IPC_RESPONSE } from '../../../../../shared/interfaces/ipc-response';
+import { ElectronApiService } from '../../../../../shared/services/electron-api.service';
+import { FolderReaderStore } from '../../folder-reader.store';
 
 @Component({
   standalone: true,
@@ -27,7 +27,7 @@ declare const window: any; // Ensure Electron is available
 export class MainFolderComponent {
   readonly store = inject(FolderReaderStore);
 
-  constructor(readonly router: Router) {
+  constructor(readonly router: Router, private electron: ElectronApiService) {
     this.createFolders();
 
     effect(() => {
@@ -39,34 +39,27 @@ export class MainFolderComponent {
 
   private createFolders = () => {
     for (let index = 1; index < random(5); index++) {
-      window
-        .require('electron')
-        .ipcRenderer.send(
-          IPC_EVENT.CREATE_FOLDER,
-          `${environment.dir}/Folder ${index}`
-        );
+      this.electron.send(
+        IPC_EVENT.CREATE_FOLDER,
+        `${environment.root}/Folder ${index}`
+      );
     }
 
     this.readFolders();
   };
 
   private readFolders = () => {
-    window
-      .require('electron')
-      .ipcRenderer.send(IPC_EVENT.READ_FOLDER, environment.dir);
+    this.electron.send(IPC_EVENT.READ_FOLDER, environment.root);
 
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.READ_FOLDER_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, data, error } = response;
+    this.electron
+      .once(IPC_EVENT.READ_FOLDER_RESPONSE)
+      .then((response: IPC_RESPONSE) => {
+        const { success, data, error } = response;
 
-          if (success && data) {
-            this.store.setFolders(data);
-          } else alert('Error reading folder: ' + error);
-        }
-      );
+        if (success && data) {
+          this.store.setFolders(data);
+        } else alert('Error reading folder: ' + error);
+      });
   };
 
   onRoute = (dir: string) => {

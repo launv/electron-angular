@@ -2,14 +2,14 @@ import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'environments/environment';
+import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { takeUntil } from 'rxjs';
 import { IPC_EVENT } from '../../../../../shared/constants/main-events';
 import { IPC_RESPONSE } from '../../../../../shared/interfaces/ipc-response';
 import { ObservableComponent } from '../../../../../shared/observable/observable.component';
+import { ElectronApiService } from '../../../../../shared/services/electron-api.service';
 import { SymptomStore } from './symptom.store';
-import { ButtonModule } from 'primeng/button';
-declare const window: any; // Ensure Electron is available
 
 @Component({
   standalone: true,
@@ -28,17 +28,17 @@ export class SymptomTableComponent extends ObservableComponent {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private electron: ElectronApiService
   ) {
     super();
 
     activatedRoute.params.pipe(takeUntil(this.$destroy)).subscribe((res) => {
       const { dir, system, symptom } = res;
       this.symptomName = symptom;
-      const routeTree = [environment.dir, dir, system, symptom, 'data.json'];
+      const routeTree = [environment.root, dir, system, symptom, 'data.json'];
       const filePath = routeTree.join('/');
-      // this.readFile(filePath);
-      this.writeFile(filePath);
+      this.readFile(filePath);
     });
   }
 
@@ -62,43 +62,39 @@ export class SymptomTableComponent extends ObservableComponent {
       },
     ];
 
-    window.require('electron').ipcRenderer.send(IPC_EVENT.WRITE_FILE, {
+    this.electron.send(IPC_EVENT.WRITE_FILE, {
       filePath,
       content: JSON.stringify(data),
     });
 
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.WRITE_FILE_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, error } = response;
+    this.electron
+      .once(IPC_EVENT.WRITE_FILE_RESPONSE)
+      .then((response: IPC_RESPONSE) => {
+        const { success, error } = response;
 
-          if (success) this.readFile(filePath);
-          else alert('Error writing file: ' + error);
-        }
-      );
+        if (success) this.readFile(filePath);
+        else alert('Error writing file: ' + error);
+      });
   };
   /**
    *
    * @param filePath
    */
   readFile = (filePath: string) => {
-    window.require('electron').ipcRenderer.send(IPC_EVENT.READ_FILE, filePath);
+    this.electron.send(IPC_EVENT.READ_FILE, filePath);
 
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.READ_FILE_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, data, error } = response;
+    this.electron
+      .once(IPC_EVENT.READ_FILE_RESPONSE)
+      .then((response: IPC_RESPONSE) => {
+        const { success, data, error } = response;
 
-          if (success && data) {
-            const products = JSON.parse(data);
-            this.componentStore.setProducts(products);
-          } else alert('Error reading file: ' + error);
+        if (success && data) {
+          const products = JSON.parse(data);
+          this.componentStore.setProducts(products);
+        } else {
+          this.writeFile(filePath);
         }
-      );
+      });
   };
 
   /**

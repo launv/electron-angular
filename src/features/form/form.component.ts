@@ -5,15 +5,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { environment } from 'environments/environment';
 import { ButtonModule } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { IPC_EVENT } from '../../../shared/constants/main-events';
 import { IPC_RESPONSE } from '../../../shared/interfaces/ipc-response';
-import { environment } from 'environments/environment';
-
-declare const window: any; // Ensure Electron is available
+import { ElectronApiService } from '../../../shared/services/electron-api.service';
 
 interface City {
   name: string;
@@ -35,11 +34,11 @@ interface City {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponent {
-  filePath = environment.dir + '/test.txt'; // Change as needed
+  filePath = environment.root + '/test.txt'; // Change as needed
   formGroup: FormGroup | undefined;
   cities: City[] = [];
 
-  constructor() {
+  constructor(private electron: ElectronApiService) {
     this.cities = [
       { name: 'New York', code: 'NY' },
       { name: 'Rome', code: 'RM' },
@@ -58,41 +57,33 @@ export class FormComponent {
 
   writeFile() {
     const content = JSON.stringify(this.formGroup?.value);
-    window.require('electron').ipcRenderer.send(IPC_EVENT.WRITE_FILE, {
+    this.electron.send(IPC_EVENT.WRITE_FILE, {
       filePath: this.filePath,
       content,
     });
 
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.WRITE_FILE_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, error } = response;
+    this.electron
+      .once(IPC_EVENT.WRITE_FILE_RESPONSE)
+      .then((response: IPC_RESPONSE) => {
+        const { success, error } = response;
 
-          if (success) alert('File written successfully!');
-          else alert('Error writing file: ' + error);
-        }
-      );
+        if (success) alert('File written successfully!');
+        else alert('Error writing file: ' + error);
+      });
   }
 
   readFile() {
-    window
-      .require('electron')
-      .ipcRenderer.send(IPC_EVENT.READ_FILE, this.filePath);
+    this.electron.send(IPC_EVENT.READ_FILE, this.filePath);
 
-    window
-      .require('electron')
-      .ipcRenderer.once(
-        IPC_EVENT.READ_FILE_RESPONSE,
-        (_: any, response: IPC_RESPONSE) => {
-          const { success, data, error } = response;
+    this.electron
+      .once(IPC_EVENT.READ_FILE_RESPONSE)
+      .then((response: IPC_RESPONSE) => {
+        const { success, data, error } = response;
 
-          if (success && data) {
-            const formValue = JSON.parse(data);
-            this.formGroup?.setValue(formValue);
-          } else alert('Error reading file: ' + error);
-        }
-      );
+        if (success && data) {
+          const formValue = JSON.parse(data);
+          this.formGroup?.setValue(formValue);
+        } else alert('Error reading file: ' + error);
+      });
   }
 }
